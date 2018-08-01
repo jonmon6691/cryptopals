@@ -35,8 +35,8 @@ size_t str2bytes(char* input, char **output) {
 
 size_t bytes2base64(char *input, char **output, size_t input_length)
 {
-    // 0b12345678  90123456  78901234
-    // 0b123456-78 9012-3456 78-901234
+    // 0b12345678   90123456  78901234 Bytes (8 bits each)
+    // 0b123456-78 9012-3456 78-901234 Base 64 digits (6 bits each)
     size_t output_size = sizeof(char) * input_length / 3 * 4;
     if (input_length % 3 != 0) // Padding needed, add bytes to the output size
         output_size += 4;
@@ -57,7 +57,6 @@ size_t bytes2base64(char *input, char **output, size_t input_length)
             o[i*4/3+2] = base64map[(0x3C & input[i+1] << 2) | (0x03 & input[i+2] >> 6)];
             o[i*4/3+3] = base64map[(0x3f & input[i+2])];
         } else {
-            pd("i=", i);
             o[i*4/3+2] = base64map[0x3C & input[i+1] << 2];
             o[i*4/3+3] = '=';
         }

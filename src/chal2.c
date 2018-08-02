@@ -2,20 +2,23 @@
 #include "crypto_tools.h"
 
 
-char *input = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-char *input_bytes;
+char *a = "1c0111001f010100061a024b53535009181c";
+char *b = "686974207468652062756c6c277320657965";
+uint8_t *a_bytes;
+uint8_t *b_bytes;
 
+#define MIN(a,b) ((a<b)?a:b)
 
 int main() 
 {
-    size_t input_size = str2bytes(input, &input_bytes);
-    char *b64;
-    size_t b64_size = bytes2base64(input_bytes, &b64, input_size);
-    for (int i=0; i < b64_size; i++)
-        printf("%c", b64[i]);
-    printf("\n%s", b64);
+    size_t a_size = str2bytes(a, &a_bytes);
+    size_t b_size = str2bytes(b, &b_bytes);
+    
+    for (int i=0; i < MIN(a_size,b_size); i++)
+        printf("%02x", a_bytes[i]^b_bytes[i]);
+    printf("\n");
 
-    free(b64);
-    free(input_bytes);
+    free(a_bytes);
+    free(b_bytes);
     return 0;
 }

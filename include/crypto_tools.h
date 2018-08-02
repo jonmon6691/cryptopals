@@ -11,6 +11,10 @@ uint8_t is_wordchar(char a);
     output is a number between 0 and 1, where 1 is all letters */
 float plaintext_score(uint8_t *potential_plaintext, size_t input_length);
 
+/* Brute forces a 1-byte xor key over an encrypted buffer, returns
+    the key that maximizes the plaintext_score of the output */
+uint8_t byte_xor_crack(char* cyphertext, size_t len);
+
 /* Converts a single hex character into an integer in the range [0-15] */
 uint8_t hexdig2int(char dig);
 

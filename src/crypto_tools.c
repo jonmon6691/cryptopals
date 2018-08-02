@@ -11,6 +11,7 @@ uint8_t is_wordchar(char a)
     return (a >= 'a' && a <= 'z' || a >= 'A' && a <= 'Z');
 }
 
+
 float plaintext_score(uint8_t *potential_plaintext, size_t input_length)
 {
     float score = 0;
@@ -19,6 +20,26 @@ float plaintext_score(uint8_t *potential_plaintext, size_t input_length)
     }
     return score / input_length;
 }
+
+
+uint8_t byte_xor_crack(char* cyphertext, size_t len) {
+    char *plaintext = malloc(len);
+    float best_score = 0;
+    uint8_t best_key;
+    for (int key = 0; key <= 0xFF; key++) {
+        for (int i=0; i < len; i++) {
+            plaintext[i] = cyphertext[i] ^ key;
+        }
+        float score = plaintext_score(plaintext, len);
+        if (score > best_score) {
+            best_score = score;
+            best_key = key;
+        }
+    }
+    free(plaintext);
+    return best_key;
+}
+
 
 uint8_t hexdig2int(char hexdig) {
     if (hexdig >= '0' && hexdig <= '9') {

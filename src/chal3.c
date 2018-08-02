@@ -10,21 +10,14 @@ uint8_t *ct_bytes;
 int main() 
 {
     size_t ct_size = str2bytes(cyphertext, &ct_bytes);
-    char *plaintext = (char*)malloc(ct_size+1);
-    plaintext[ct_size] = 0; // Null terminated string
-    float best_score = 0;
+    
+    uint8_t key = byte_xor_crack(ct_bytes, ct_size);
 
-    for (int key = 0; key < 0x100; key++) {
-        for (int i=0; i < ct_size; i++) {
-            plaintext[i] = ct_bytes[i] ^ key;
-        }
-        float score = plaintext_score(plaintext, ct_size);
-        if (score > best_score) {
-            best_score = score;
-            printf("0x%02x: %s\n", key, plaintext);
-        }
-    }
-
+    printf("%02x: ", key);
+    for (int i=0; i < ct_size; i++)
+        putc(ct_bytes[i] ^ key, stdout);
+    putc('\n', stdout);
+    
     free(ct_bytes);
     return 0;
 }

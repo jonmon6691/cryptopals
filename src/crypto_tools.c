@@ -43,22 +43,23 @@ size_t bytes2base64(char *input, char **output, size_t input_length)
     *output = (char*) malloc (output_size + 1); // Add room for null terminator
     char* o = *output; // Convinient accessor variable
     for (int i=0; i < input_length; i+=3) {
-        o[i*4/3+0] = base64map[0x3f & (input[i] >> 2)];
+        int j = i*4/3;
+        o[j+0] = base64map[0x3f & (input[i] >> 2)];
         
         if (i+1 < input_length) {
-            o[i*4/3+1] = base64map[(0x30 & input[i]<<4) | (0x0f & input[i+1]>>4)];
+            o[j+1] = base64map[(0x30 & input[i]<<4) | (0x0f & input[i+1]>>4)];
         } else {
-            o[i*4/3+1] = base64map[0x30 & input[i]<<4];
-            o[i*4/3+2] = '=';
-            o[i*4/3+3] = '=';
+            o[j+1] = base64map[0x30 & input[i]<<4];
+            o[j+2] = '=';
+            o[j+3] = '=';
             break;
         }
         if (i+2 < input_length) {
-            o[i*4/3+2] = base64map[(0x3C & input[i+1] << 2) | (0x03 & input[i+2] >> 6)];
-            o[i*4/3+3] = base64map[(0x3f & input[i+2])];
+            o[j+2] = base64map[(0x3C & input[i+1] << 2) | (0x03 & input[i+2] >> 6)];
+            o[j+3] = base64map[(0x3f & input[i+2])];
         } else {
-            o[i*4/3+2] = base64map[0x3C & input[i+1] << 2];
-            o[i*4/3+3] = '=';
+            o[j+2] = base64map[0x3C & input[i+1] << 2];
+            o[j+3] = '=';
         }
     }
     o[output_size] = '\0';

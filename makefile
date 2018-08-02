@@ -3,7 +3,7 @@ CFLAGS=-Iinclude -I"C:\Program Files\OpenSSL\include" -nologo
 #DEPS = hellomake.h
 OBJ = crypto_tools.obj
 
-all: chal1.exe chal1_ssl.exe chal2.exe chal3.exe
+all: chal1.exe chal1_ssl.exe chal2.exe chal3.exe chal4.exe
 
 obj/%.obj: src/%.c
 	$(CC) -c /Fo: $@ $< $(CFLAGS)
@@ -20,6 +20,9 @@ chal2.exe: obj/chal2.obj obj/crypto_tools.obj
 	$(CC) /Fe: $@ $^ $(CFLAGS)
 
 chal3.exe: obj/chal3.obj obj/crypto_tools.obj
+	$(CC) /Fe: $@ $^ $(CFLAGS)
+
+chal4.exe: obj/chal4.obj obj/crypto_tools.obj
 	$(CC) /Fe: $@ $^ $(CFLAGS)
 
 clean:

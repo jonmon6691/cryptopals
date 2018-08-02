@@ -2,3 +2,6 @@
 *.DS_Store
 *.obj
 *.zip
+*.lib
+*.exp
+*.dll

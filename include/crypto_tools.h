@@ -2,6 +2,15 @@
 #define CRYPTO_TOOLS_H
 #include <inttypes.h>
 
+#define MIN(a,b) ((a<b)?a:b)
+
+/* Return 1 if argument is an ASCII letter [a-zA-Z] */
+uint8_t is_wordchar(char a);
+
+/* Returns the fraction of bytes in the input that are letters [a-zA-Z] 
+    output is a number between 0 and 1, where 1 is all letters */
+float plaintext_score(uint8_t *potential_plaintext, size_t input_length);
+
 /* Converts a single hex character into an integer in the range [0-15] */
 uint8_t hexdig2int(char dig);
 

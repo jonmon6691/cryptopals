@@ -6,22 +6,6 @@
 char *cyphertext = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
 uint8_t *ct_bytes;
 
-#define MIN(a,b) ((a<b)?a:b)
-
-uint8_t is_wordchar(char a)
-{
-    return (a >= 'a' && a <= 'z' || a >= 'A' && a <= 'Z');
-
-}
-
-float plaintext_score(uint8_t *potential_plaintext, size_t input_length)
-{
-    float score = 0;
-    for (int i=0; i< input_length; i++) {
-        score += is_wordchar(potential_plaintext[i])?1:0;
-    }
-    return score / input_length;
-}
 
 int main() 
 {

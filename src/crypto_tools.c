@@ -1,10 +1,23 @@
-
 #include <inttypes.h>
 #include <assert.h>
+
 char *base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 #define pd(s, d) printf("%s:%d ", s, d)
 
+uint8_t is_wordchar(char a)
+{
+    return (a >= 'a' && a <= 'z' || a >= 'A' && a <= 'Z');
+}
+
+float plaintext_score(uint8_t *potential_plaintext, size_t input_length)
+{
+    float score = 0;
+    for (int i=0; i< input_length; i++) {
+        score += is_wordchar(potential_plaintext[i])?1:0;
+    }
+    return score / input_length;
+}
 
 uint8_t hexdig2int(char hexdig) {
     if (hexdig >= '0' && hexdig <= '9') {

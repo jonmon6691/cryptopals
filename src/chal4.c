@@ -13,6 +13,7 @@ Find it.
 #include <string.h>
 #include "crypto_tools.h"
 
+
 int main() 
 {
     FILE *fp;
@@ -21,53 +22,44 @@ int main()
         exit(1);
     }
 
-    char *plaintext = malloc(sizeof(char) * 256);
     char *cyphertext = malloc(sizeof(char) * 256);
     char *ct_bytes;
 
-    float best_score = 0;
-    uint8_t best_key;
     int best_row = 0;
-    char *best_plaintext = malloc(sizeof(char) * 128);
+    struct byte_xor_chunk best = {NULL, 0, 0, 0};
 
-    int row = 0;
-    while (!feof(fp)) {
+    // Loop through the whole file
+    for (int row=0; !feof(fp); row++) {
+        // Read line from file
         if (fgets(cyphertext, 255, fp) == NULL) {
             fprintf(stderr, "ERROR: Couldn't read file!");
             exit(1);
         }
 
-        cyphertext[strnlen(cyphertext, 256)-1] = 0; // Strip newline
-        printf("%s ", cyphertext);
+        // Strip newline
+        cyphertext[strnlen(cyphertext, 256)-1] = 0;
+        // Convert hex to raw bytes
         size_t ct_size = str2bytes(cyphertext, &ct_bytes);
+        // Get the best key
+        struct byte_xor_chunk cur = byte_xor_crack(ct_bytes, ct_size);
 
-        uint8_t key = byte_xor_crack(ct_bytes, ct_size);
-        printf("%02x,", key);
-
-        for (int i=0; i<ct_size; i++) { // Decrypt in place
-            //ct_bytes[i] ^= key;
-            putc(ct_bytes[i] ^ key, stdout);
-        }
-
-        float score = plaintext_score(ct_bytes, ct_size);
-        printf("%f\n", score);
-        if (score > best_score) {
-            best_score = score;
-            best_key = key;
-            best_row = row;
-            for (int i=0; i<ct_size; i++)
-                best_plaintext[i] = ct_bytes[i];
+        // Keep track of the best score so far
+        if (cur.score > best.score) {
+            best = cur;
+            best_row = row + 1;
+        } else {
+            // Throw away results that aren't the best
+            // Dont forget this allocated memory!
+            free(cur.plaintext);
         }
         free(ct_bytes);
-        row++;
     }
 
-    printf("Line %d, Key %02x: ", best_row, best_key);
-    for (int i=0; i<128; i++)
-        putc(best_plaintext[i], stdout);
-    printf("\n");
+    printf("Line %d, Key 0x%02x, Score %f: ", best_row, best.key, best.score);
+    putc('\'', stdout);
+    for (int i=0; i<best.pt_size; i++) putc(best.plaintext[i], stdout);
+    putc('\'', stdout);
 
     free(cyphertext);
-    free(plaintext);
     return 0;
 }

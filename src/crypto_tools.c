@@ -1,6 +1,7 @@
 #include <inttypes.h>
 #include <assert.h>
 #include <stdlib.h>
+#include "crypto_tools.h"
 
 char *base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -8,7 +9,7 @@ char *base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678
 
 uint8_t is_wordchar(char a)
 {
-    return (a >= 'a' && a <= 'z' || a >= 'A' && a <= 'Z');
+    return (a >= 'a' && a <= 'z' || a >= 'A' && a <= 'Z' || a == ' ' || a == '\'');
 }
 
 
@@ -16,28 +17,32 @@ float plaintext_score(uint8_t *potential_plaintext, size_t input_length)
 {
     float score = 0;
     for (int i=0; i< input_length; i++) {
-        score += is_wordchar(potential_plaintext[i])?1:0;
+        score += is_wordchar(potential_plaintext[i])?1.0f:0.0f;
     }
     return score / input_length;
 }
 
 
-uint8_t byte_xor_crack(char* cyphertext, size_t len) {
-    char *plaintext = malloc(len);
-    float best_score = 0;
-    uint8_t best_key;
+struct byte_xor_chunk byte_xor_crack(char* cyphertext, size_t len) {
+    struct byte_xor_chunk out;
+    out.plaintext = malloc(len);
+    out.score = 0;
+    out.key = 0;
+    out.pt_size = len;
     for (int key = 0; key <= 0xFF; key++) {
         for (int i=0; i < len; i++) {
-            plaintext[i] = cyphertext[i] ^ key;
+            out.plaintext[i] = cyphertext[i] ^ key;
         }
-        float score = plaintext_score(plaintext, len);
-        if (score > best_score) {
-            best_score = score;
-            best_key = key;
+        float score = plaintext_score(out.plaintext, len);
+        if (score > out.score) {
+            out.score = score;
+            out.key = key;
         }
     }
-    free(plaintext);
-    return best_key;
+    for (int i=0; i<out.pt_size; i++)
+        out.plaintext[i] = cyphertext[i] ^ out.key;
+
+    return out;
 }
 
 

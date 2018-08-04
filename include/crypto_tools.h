@@ -11,6 +11,9 @@ struct byte_xor_chunk {
         float score;
 };
 
+/* Returns the hamming distance of two buffers */
+int hamming_distance(char *a, char *b, size_t len);
+
 /* Return 1 if argument is an ASCII letter [a-zA-Z] */
 uint8_t is_wordchar(char a);
 

@@ -29,7 +29,9 @@ chal5.exe: obj/chal5.obj obj/crypto_tools.obj
 	$(CC) /Fe: $@ $^ $(CFLAGS)
 
 chal6.exe: obj/chal6.obj obj/crypto_tools.obj
-	$(CC) /Fe: $@ $^ $(CFLAGS)
+	$(CC) /Fe: $@ $^ $(CFLAGS)  -link -LIBPATH:"C:\Program Files\OpenSSL\lib" libcrypto.lib libssl.lib 
+	cp chal6.exp obj && rm -f chal6.exp
+	cp chal6.lib obj && rm -f chal6.lib
 
 clean:
 	rm -f obj/*.obj

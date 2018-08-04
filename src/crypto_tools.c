@@ -8,9 +8,22 @@ char *base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678
 
 #define pd(s, d) printf("%s:%d ", s, d)
 
+
+int hamming_distance(char *a, char *b, size_t len)
+{
+    int distance = 0;
+    for (int i=0; i<len; i++) {
+        uint8_t diff = a[i] ^ b[i];
+        for (int j=0; j <= 0xf; j++)
+            distance += 0x1 & diff >> j;
+    }
+    return distance;
+}
+
+
 uint8_t is_wordchar(char a)
 {
-    return (a >= 'a' && a <= 'z' || a >= 'A' && a <= 'Z' || a == ' ' || a == '\'');
+    return (a >= 'a' && a <= 'z' || a >= 'A' && a <= 'Z' || a == ' ');
 }
 
 

@@ -23,12 +23,10 @@ float plaintext_score(uint8_t *potential_plaintext, size_t input_length);
     Returns a data structure with the result */
 struct byte_xor_chunk byte_xor_crack(char* cyphertext, size_t len);
 
-/* Converts a single hex character into an integer in the range [0-15] */
-uint8_t hexdig2int(char dig);
-
-/* Input bust be a null-terminated string of an even number of hex
-    characters, case-insensitive. Allocates a buffer for the bytes
-    and stores the pointer in output, returns the size of the output buffer */
+/* Input bust be a null-terminated string of hex characters, case-insensitive.
+    Allocates a buffer for the bytes and stores the pointer in output, 
+    returns the size of the output buffer. If the input length is odd, the last
+    nibble is ignored. */
 size_t str2bytes(char* input, char **output);
 
 /* Allocates a buffer for the base26 output string, null terminated,

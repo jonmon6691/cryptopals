@@ -1,6 +1,7 @@
 #include <inttypes.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "crypto_tools.h"
 
 char *base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -46,29 +47,15 @@ struct byte_xor_chunk byte_xor_crack(char* cyphertext, size_t len) {
 }
 
 
-uint8_t hexdig2int(char hexdig) {
-    if (hexdig >= '0' && hexdig <= '9') {
-        return hexdig - '0';
-    } else if (hexdig >= 'a' && hexdig <= 'f') {
-        return hexdig - 'a' + 10;
-    } else if (hexdig >= 'A' && hexdig <= 'F') {
-        return hexdig - 'A' + 10;
-    } else return 0x10; // Error code
-}
-
-
 size_t str2bytes(char* input, char **output) {
-    unsigned long inputsize = strnlen(input, 1024);
+    unsigned long inputsize = strlen(input);
+    /* Note that this will round down, so if an odd number of nibbles
+        is input, then the last character will be ignored.*/
     size_t output_size = sizeof(uint8_t) * inputsize / 2;
-    int offset = inputsize % 2; // If the input length is odd, assume a leading 0 nibble
-    output_size += offset; // Adds a byte to the output for that nibble
-    *output = malloc(output_size);
-    if (offset) {
-        (*output)[0] = hexdig2int(input[0]);
-    }
-    for(int i = 0; i < inputsize; i+=2) {
-        (*output)[i/2+offset] = hexdig2int(input[i + offset]) * 16 + hexdig2int(input[i+1+offset]);
-    }
+    char *buff = *output = malloc(output_size);
+
+    for(int i=0, j=0; i < inputsize; i+=2)
+        sscanf(&input[i],"%02hhx", &buff[j++]);
     return output_size;
 }
 
@@ -80,8 +67,7 @@ size_t bytes2base64(char *input, char **output, size_t input_length)
     size_t output_size = sizeof(char) * input_length / 3 * 4;
     if (input_length % 3 != 0) // Padding needed, add bytes to the output size
         output_size += 4;
-    char* o = *output; // Convinient accessor variable
-    o = malloc(output_size + 1); // Add room for null terminator
+    char *o = *output = malloc(output_size + 1); // Add room for null terminator
     for (int i=0; i < input_length; i+=3) {
         int j = i*4/3;
         o[j+0] = base64map[0x3f & (input[i] >> 2)];

@@ -115,7 +115,6 @@ int main()
         if (dist_avg < smallest_dist) {
             smallest_dist = dist_avg;
             best_key_size = key_size;
-            printf("key len: %zd, hd: %f\n", key_size, dist_avg);
         }
     }
 

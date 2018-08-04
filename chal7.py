@@ -3,7 +3,7 @@ import itertools
 import string
 
 cyphertext = None
-with open("6.txt", 'rb') as f:
+with open("7.txt", 'rb') as f:
     cyphertext = base64.standard_b64decode(f.read())
 
 def hamming_dist(a, b):

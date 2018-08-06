@@ -89,7 +89,7 @@ int main()
     size_t total_size;
     char *file_data = load_base64_aes_file(stdin, &total_size);
 
-    printf("Length: %d\n", total_size);
+    printf("Length: %zd\n", total_size);
     printf("Plaintext:\n");
     for (size_t i=0; i < total_size; i++) {
         putc(file_data[i], stdout);

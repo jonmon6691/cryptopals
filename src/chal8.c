@@ -10,24 +10,29 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include "crypto_tools.h"
 
 #define CHUNK_SIZE 1024
 char file_buf[CHUNK_SIZE];
 
-char *key = "ICE";
-size_t key_len = 3;
+// AES 128 bit block represented in hex takes 32 bytes 
+#define BLOCK_LEN 32
 
 int main() 
 {
     // Loop through the whole file
-    int key_index = 0;
-    while (!feof(stdin)) {
-        size_t in_len = fread(file_buf, sizeof(char), CHUNK_SIZE, stdin);
-        for (int i=0; i<in_len; i++)
-            printf("%02x", file_buf[i] ^ key[key_index++%key_len]);
+    for (int line = 1; !feof(stdin); line++) {
+        // Line by line
+        fgets(file_buf, CHUNK_SIZE, stdin);
+        // Get the length of the line read in
+        size_t in_len = strnlen(file_buf, CHUNK_SIZE);
+        // Loop through all the encrypted blocks
+        for (int i = 0; i < in_len; i += BLOCK_LEN)
+            // Loop through the remaining of the encrypted blocks
+            for (int j = i + BLOCK_LEN; j < in_len; j += BLOCK_LEN)
+                // Compare the two, print if a match is found
+                if (memcmp(&file_buf[i], &file_buf[j], BLOCK_LEN) == 0)
+                    printf("Row %d, Blocks %d, %d both %.32s\n", line, i/BLOCK_LEN, j/BLOCK_LEN, &file_buf[i]);
     }
     return 0;
 }

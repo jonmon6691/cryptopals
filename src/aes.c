@@ -11,7 +11,8 @@ void aes_128_block_encrypt(char *input, char *output, char *key)
 {
     struct aes_state s;
     s.si = 0;
-    s.debug = false;
+    s.debug = true;
+    s.ks_index = 0;
 
     memccpy(dref(&s)->bytes, input, sizeof(char), 16);
 
@@ -24,7 +25,7 @@ void aes_128_block_encrypt(char *input, char *output, char *key)
 
     aes_add_round_key(&s);
 
-    for (int round = 0; round < 10; round++) {
+    for (int round = 0; round < 9; round++) {
         printf("Round %d\n", round);
         aes_sub_bytes(&s);
         aes_shift_rows(&s);
@@ -106,32 +107,42 @@ union block *dref(struct aes_state *s)
 
 void aes_compute_key_schedule(struct aes_state *s, char *key)
 {
-    memccpy((char *)s->key_sched, key, sizeof(char), 16);
+    // First 16 bytes of key schedule are the actual key
+    for (int i = 0; i < 16; i++)
+        ((char *)s->key_sched)[i] = key[i];
+    // Generate key material for the rounds and key-whitening
     for (int i = 4; i < 44; i++) {
-        union {
-            uint32_t word;
-            uint8_t bytes[4];
-        } temp;
-        temp.word = s->key_sched[i - 1];
+        uint32_t temp;
+        char * temp_b = &(char)temp; // Easier byte-indexing into temp
+        temp = s->key_sched[i - 1];
         if (i % 4 == 0) {
-            temp.word = temp.word >> 8 | temp.word << 24;
+            temp = temp >> 8 | temp << 24;
             for (int j = 0; j < 4; j++)
-                temp.bytes[j] = s_box(temp.bytes[j]);
-            temp.bytes[0] ^= aes_round_constant(i / 4);
+                temp_b[j] = s_box(temp_b[j]);
+            temp_b[0] ^= aes_round_constant(i / 4);
         }
-        s->key_sched[i] = temp.word ^ s->key_sched[i - 4];
+        s->key_sched[i] = temp ^ s->key_sched[i - 4];
     }
-    for (int i = 0; i < 44; i++) {
-        for( int j = 0; j < 4; j++) {
-            printf("%02hhx", ((char *)s->key_sched)[i*4+j]);
+    if (s->debug) {
+        printf("aes_compute_key_schedule:\n");
+        for (int i = 0; i < 44; i++) {
+            for( int j = 0; j < 4; j++) {
+                printf("%02hhx", ((char *)s->key_sched)[i*4+j]);
+            }
+            printf("\n");
         }
-        printf("\n");
     }
     return;
 }
 
 void aes_add_round_key(struct aes_state * s)
 {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            dref(s)->bytes[i*4+j] ^= ((char *)s->key_sched)[s->ks_index*4+j];
+        }
+        s->ks_index++;
+    }
     if (s->debug) {
         printf("aes_add_round_key\n");
         aes_print_block(s);
@@ -204,11 +215,21 @@ void aes_print_block(struct aes_state * s)
     printf("\n");
 }
 
+
 int main()
 {
-    char input[] = "1234567890123456";
-    char key[] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
+#if 1
+    char input[] =    {0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34};
+    char key[] =      {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
+    char expected[] = {0x39, 0x25, 0x84, 0x1d, 0x02, 0xdc, 0x09, 0xfb, 0xdc, 0x11, 0x85, 0x97, 0x19, 0x6a, 0x0b, 0x32};
+#else
+    char input[] =     {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+    char key[] =       {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+    char expected[] =  {0x69, 0xc4, 0xe0, 0xd8, 0x6a, 0x7b, 0x04, 0x30, 0xd8, 0xcd, 0xb7, 0x80, 0x70, 0xb4, 0xc5, 0x5a};
+#endif
     aes_128_block_encrypt(input, input, key);
-    
+    if(memcmp(input, expected, 16) == 0)
+        printf("Pass.");
+
     return 0;
 }

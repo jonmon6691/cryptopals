@@ -216,7 +216,7 @@ void aes_print_block(struct aes_state * s)
 }
 
 
-int main()
+int test()
 {
 #if 1
     char input[] =    {0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34};
@@ -230,6 +230,8 @@ int main()
     aes_128_block_encrypt(input, input, key);
     if(memcmp(input, expected, 16) == 0)
         printf("Pass.");
+    else
+        printf("Fail.");
 
     return 0;
 }

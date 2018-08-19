@@ -8,6 +8,20 @@ char *base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678
 
 #define pd(s, d) printf("%s:%d ", s, d)
 
+size_t pkcs7_padding(const char *message, size_t msg_len, char *pt_out[], uint8_t block_len)
+{
+    int n_blks = msg_len / block_len + 1;
+    size_t pt_len = n_blks * block_len;
+    char *plaintext = malloc(pt_len);
+    for (int i = 0; i < msg_len; i++) {
+        plaintext[i] = message[i];
+    }
+    for (int i = msg_len; i < pt_len; i++) {
+        plaintext[i] = pt_len - msg_len;
+    }
+    *pt_out = plaintext;
+    return pt_len;
+}
 
 int hamming_distance(char *a, char *b, size_t len)
 {

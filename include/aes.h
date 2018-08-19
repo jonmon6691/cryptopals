@@ -19,6 +19,8 @@ struct aes_state {
     bool debug;
 };
 
+void aes_128_block_decrypt(char *input, char *output, char *key);
+
 void aes_128_block_encrypt(char *input, char *output, char *key);
 
 uint8_t s_box(uint8_t s);

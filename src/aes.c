@@ -5,6 +5,10 @@
 #include <string.h>
 #include "aes.h"
 
+void aes_128_block_decrypt(char *input, char *output, char *key)
+{
+    return;
+}
 
 
 void aes_128_block_encrypt(char *input, char *output, char *key)

@@ -11,6 +11,10 @@ struct byte_xor_chunk {
         float score;
 };
 
+char *bas64_decode_file(FILE *fp, size_t *len);
+
+size_t pkcs7_padding(const char *message, size_t msg_len, char *pt_out[], uint8_t block_len);
+
 /* Returns the hamming distance of two buffers */
 int hamming_distance(char *a, char *b, size_t len);
 

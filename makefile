@@ -44,7 +44,7 @@ chal8.exe: obj/chal8.obj obj/crypto_tools.obj
 chal9.exe: obj/chal9.obj obj/crypto_tools.obj
 	$(CC) /Fe: $@ $^ $(CFLAGS)
 
-chal10.exe: obj/chal9.obj obj/crypto_tools.obj obj/aes.obj
+chal10.exe: obj/chal10.obj obj/crypto_tools.obj obj/aes.obj
 	$(CC) /Fe: $@ $^ $(CFLAGS)
 
 clean:

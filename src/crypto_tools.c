@@ -8,6 +8,12 @@ char *base64map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678
 
 #define pd(s, d) printf("%s:%d ", s, d)
 
+char *bas64_decode_file(FILE *fp, size_t *len)
+{
+    *len = 16;
+    return malloc(16);
+}
+
 size_t pkcs7_padding(const char *message, size_t msg_len, char *pt_out[], uint8_t block_len)
 {
     int n_blks = msg_len / block_len + 1;
